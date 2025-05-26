@@ -89,13 +89,20 @@ WHERE
 extract(year from discovery_date) <1800;
 
 -- problem 8
-SELECT sighting_id,
-    CASE 
-        WHEN EXTRACT(HOUR FROM sighting_time) < 12 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM sighting_time) BETWEEN 12 AND 16 THEN 'Afternoon'
-        WHEN EXTRACT(HOUR FROM sighting_time) >= 17 THEN 'Evening'
-    END AS time_of_day
-FROM sightings;
+CREATE VIEW sighting_time_of_day 
+AS
+SELECT sighting_id, 'Morning' AS time_of_day FROM sightings
+WHERE EXTRACT(HOUR FROM sighting_time) < 12
+UNION
+SELECT sighting_id, 'Afternoon' AS time_of_day FROM sightings
+WHERE EXTRACT(HOUR FROM sighting_time) >= 12 AND EXTRACT(HOUR FROM sighting_time) <= 17
+UNION
+SELECT sighting_id, 'Evening' AS time_of_day FROM sightings
+WHERE EXTRACT(HOUR FROM sighting_time) > 17;
+
+SELECT * FROM sighting_time_of_day ORDER BY sighting_id;
+
+
 
 -- problem 9
 DELETE FROM rangers
